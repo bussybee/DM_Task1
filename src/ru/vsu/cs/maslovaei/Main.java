@@ -76,6 +76,7 @@ public class Main {
 
     public static int countMatrixDet(int[][] A, int n) {
         int detA = 0;
+        int degree = 1;
 
         if (n == 1) {
             return A[0][0];
@@ -84,8 +85,8 @@ public class Main {
         } else {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-
-                    detA += (int) (Math.pow(-1, i + j) * A[i][j] * countMatrixDet(A,n-1));
+                    detA += degree * A[i][j] * countMatrixDet(A,n-1);
+                    degree = -degree;
                 }
             }
         }
@@ -112,6 +113,37 @@ public class Main {
                 array[i][j] = array[i + offsetRow][j + offsetCol];
             }
         }
+
+    }
+
+    public static int sequentialSearch(int[] array, int elementToSearch) {
+        for (int index = 0; index < array.length; index++) {
+            if (array[index] == elementToSearch)
+                return index;
+        }
+        return -1;
+    }
+
+    public static int binarySearch(int[] array, int elementToSearch) {
+        int firstIndex = 0;
+        int lastIndex = array.length - 1;
+
+        while (firstIndex <= lastIndex) {
+            int middleIndex = (firstIndex + lastIndex) / 2;
+            if (array[middleIndex] == elementToSearch)
+                return middleIndex;
+            else if (array[middleIndex] < elementToSearch)
+                firstIndex = middleIndex + 1;
+            else if (array[middleIndex] > elementToSearch)
+                lastIndex = middleIndex - 1;
+        }
+        return -1;
+    }
+
+    public static int interpolationSearch(int[] array, int elementToSearch){
+        int highEnd = (array.length - 1);
+        int lowEnd = 0;
+
 
     }
 }
