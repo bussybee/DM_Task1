@@ -2,12 +2,15 @@ package ru.vsu.cs.maslovaei;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 
 public class Main {
 
-    public static void main(String[] args) {
-
+    public static void main(String[] args) throws FileNotFoundException {
+        int[][] A = readIntArray2FromFile("input.txt");
+        int detA = countMatrixDet(A, A.length);
+        writeDetToFile("output.txt", detA);
     }
 
     public static int[] toPrimitive(Integer[] arr) {
@@ -85,7 +88,8 @@ public class Main {
         } else {
             for (int i = 0; i < n; i++) {
                 for (int j = 0; j < n; j++) {
-                    detA += degree * A[i][j] * countMatrixDet(A,n-1);
+                    int[][] B = getMinor(A, i, j);
+                    detA += degree * A[i][j] * countMatrixDet(B, n - 1);
                     degree = -degree;
                 }
             }
@@ -94,56 +98,32 @@ public class Main {
     }
 
     //нахождение минора - удаление i-ой строки и j-ого столбца
-    public static void getMinor(int[][] array, int row, int col) {
-        int offsetRow = 0; //Смещение индекса строки в матрице
-        int offsetCol = 0; //Смещение индекса столбца в матрице
+    public static int[][] getMinor(int[][] array, int row, int col) {
         int n = array.length;
+        int offsetRow = n - 1; //Смещение индекса строки в матрице
+        int offsetCol = array[0].length - 1; //Смещение индекса столбца в матрице
+        int[][] result = new int[offsetRow][offsetCol];
 
-        for (int i = 0; i < n - 1; i++) {
-            //Пропустить row-ую строку
-            if (i == row) {
-                offsetRow = 1; //Как только встретили строку, которую надо пропустить, делаем смещение для исходной матрицы
-            }
-            for (int j = 0; j < n - 1; j++) {
-                //Пропустить col-ый столбец
-                if (j == col) {
-                    offsetCol = 1; //Встретили нужный столбец, пропускаем его смещением
-                    break;
+        for (int i = 0; i < n; i++) {
+            boolean isRowDeleted = row < i;
+            int resultRowIndex = isRowDeleted ? i - 1 : i;
+
+            for (int j = 0; j < array[i].length; j++) {
+                boolean isColDeleted = col < j;
+                int resultColIndex = isColDeleted ? j - 1 : 1;
+
+                if (row != i && col != j) {
+                    result[resultRowIndex][resultColIndex] = array[i][j];
                 }
-                array[i][j] = array[i + offsetRow][j + offsetCol];
             }
         }
-
+        return result;
     }
 
-    public static int sequentialSearch(int[] array, int elementToSearch) {
-        for (int index = 0; index < array.length; index++) {
-            if (array[index] == elementToSearch)
-                return index;
+    public static void writeDetToFile(String fileName, int detA)
+            throws FileNotFoundException {
+        try (PrintWriter out = new PrintWriter(fileName)) {
+            out.println(detA);
         }
-        return -1;
-    }
-
-    public static int binarySearch(int[] array, int elementToSearch) {
-        int firstIndex = 0;
-        int lastIndex = array.length - 1;
-
-        while (firstIndex <= lastIndex) {
-            int middleIndex = (firstIndex + lastIndex) / 2;
-            if (array[middleIndex] == elementToSearch)
-                return middleIndex;
-            else if (array[middleIndex] < elementToSearch)
-                firstIndex = middleIndex + 1;
-            else if (array[middleIndex] > elementToSearch)
-                lastIndex = middleIndex - 1;
-        }
-        return -1;
-    }
-
-    public static int interpolationSearch(int[] array, int elementToSearch){
-        int highEnd = (array.length - 1);
-        int lowEnd = 0;
-
-
     }
 }
